@@ -2,8 +2,11 @@
 // with proper type declarations (`PrismaClient` etc.) that avoids
 // any issues with the top‑level package's broken `index.d.ts`.
 import { PrismaClient } from "./generated/prisma/client";
+// Prisma 7 requires specifying an adapter or accelerateUrl when using the
+// new client engine. We simply use the PostgreSQL adapter to keep the
+// default binary behaviour and point it at our DATABASE_URL.
+import { PrismaPg } from "@prisma/adapter-pg";
 
-// An empty options object is fine at runtime, but the generated type
-// is a weird `Subset<PrismaClientOptions, PrismaClientOptions>` which does
-// not accept `{}` directly. Coerce to `any` to avoid the compilation error.
-export const prisma = new PrismaClient({} as any);
+export const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+});
