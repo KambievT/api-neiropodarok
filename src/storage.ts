@@ -1,13 +1,17 @@
-import bcrypt from 'bcryptjs';
-import { prisma } from './prisma';
-import { DayEntry, EntriesByDay, User } from './types';
-
-export async function createUser(email: string, password: string): Promise<User> {
+import bcrypt from "bcryptjs";
+import { prisma } from "./prisma";
+import { DayEntry, EntriesByDay, User } from "./types"; // Import the Prisma namespace from the generated client so we have
+// the correct TransactionClient type and other model types available.
+import type { Prisma } from "./generated/prisma/client";
+export async function createUser(
+  email: string,
+  password: string,
+): Promise<User> {
   const existing = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
   });
   if (existing) {
-    throw new Error('USER_ALREADY_EXISTS');
+    throw new Error("USER_ALREADY_EXISTS");
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -37,7 +41,10 @@ export async function findUserByEmail(email: string): Promise<User | null> {
   };
 }
 
-export async function validateUser(email: string, password: string): Promise<User | null> {
+export async function validateUser(
+  email: string,
+  password: string,
+): Promise<User | null> {
   const user = await findUserByEmail(email);
   if (!user) return null;
   const match = await bcrypt.compare(password, user.passwordHash);
@@ -69,9 +76,12 @@ export async function getEntriesForUser(userId: string): Promise<EntriesByDay> {
   return result;
 }
 
-export async function setEntriesForUser(userId: string, nextEntries: EntriesByDay): Promise<void> {
+export async function setEntriesForUser(
+  userId: string,
+  nextEntries: EntriesByDay,
+): Promise<void> {
   // Транзакция: очищаем старые записи пользователя и записываем новые
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.entriesByDay.deleteMany({ where: { userId } });
 
     const data = Object.entries(nextEntries).flatMap(([dayKey, entries]) =>
@@ -91,4 +101,3 @@ export async function setEntriesForUser(userId: string, nextEntries: EntriesByDa
     }
   });
 }
-
