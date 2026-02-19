@@ -7,8 +7,10 @@ export interface User {
 export interface DayEntry {
   id: string;
   clientName: string;
+  description?: string;
   amount: number;
   cost?: number;
+  duration?: number;
   completed?: boolean;
 }
 
@@ -20,4 +22,3 @@ export interface AuthRequestUser {
   id: string;
   email: string;
 }
-

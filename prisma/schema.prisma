@@ -22,14 +22,16 @@ model User {
 }
 
 model EntriesByDay {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  dayKey    String
-  clientName String
-  amount    Int
-  cost      Int?
-  completed Boolean? @default(false)
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  dayKey      String
+  clientName  String
+  description String? // Описание заявки (необязательно)
+  amount      Int
+  cost        Int?
+  duration    Int?    // Длительность в секундах (необязательно)
+  completed   Boolean? @default(false)
 
   @@index([userId, dayKey])
 }

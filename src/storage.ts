@@ -63,8 +63,10 @@ export async function getEntriesForUser(userId: string): Promise<EntriesByDay> {
     const entry: DayEntry = {
       id: row.id,
       clientName: row.clientName,
+      description: row.description ?? undefined,
       amount: row.amount,
       cost: row.cost ?? undefined,
+      duration: row.duration ?? undefined,
       completed: row.completed ?? undefined,
     };
     if (!result[row.dayKey]) {
@@ -90,8 +92,10 @@ export async function setEntriesForUser(
         userId,
         dayKey,
         clientName: e.clientName,
+        description: e.description ?? null,
         amount: e.amount,
         cost: e.cost ?? null,
+        duration: e.duration ?? null,
         completed: e.completed ?? false,
       })),
     );
