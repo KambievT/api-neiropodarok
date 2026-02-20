@@ -62,7 +62,6 @@ export async function getEntriesForUser(userId: string): Promise<EntriesByDay> {
   for (const row of rows) {
     const entry: DayEntry = {
       id: row.id,
-      clientName: row.clientName,
       contractorId: row.contractorId ?? undefined,
       description: row.description ?? undefined,
       serviceType: (row.serviceType as DayEntry["serviceType"]) ?? "individual",
@@ -93,7 +92,6 @@ export async function setEntriesForUser(
         id: e.id,
         userId,
         dayKey,
-        clientName: e.clientName,
         contractorId: e.contractorId ?? null,
         description: e.description ?? null,
         serviceType: e.serviceType ?? "individual",

@@ -39,7 +39,6 @@ model EntriesByDay {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
   dayKey      String
-  clientName  String
   contractor  Contractor? @relation(fields: [contractorId], references: [id], onDelete: SetNull)
   contractorId String?
   description String? // Описание заявки (необязательно)

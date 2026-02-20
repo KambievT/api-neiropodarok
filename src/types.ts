@@ -6,7 +6,6 @@ export interface User {
 
 export interface DayEntry {
   id: string;
-  clientName: string;
   contractorId?: string;
   description?: string;
   serviceType?: "individual" | "group";
