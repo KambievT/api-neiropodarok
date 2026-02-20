@@ -60,8 +60,12 @@ async function getEntriesForUser(userId) {
         const entry = {
             id: row.id,
             clientName: row.clientName,
+            contractorId: row.contractorId ?? undefined,
+            description: row.description ?? undefined,
+            serviceType: row.serviceType ?? "individual",
             amount: row.amount,
             cost: row.cost ?? undefined,
+            duration: row.duration ?? undefined,
             completed: row.completed ?? undefined,
         };
         if (!result[row.dayKey]) {
@@ -80,8 +84,12 @@ async function setEntriesForUser(userId, nextEntries) {
             userId,
             dayKey,
             clientName: e.clientName,
+            contractorId: e.contractorId ?? null,
+            description: e.description ?? null,
+            serviceType: e.serviceType ?? "individual",
             amount: e.amount,
             cost: e.cost ?? null,
+            duration: e.duration ?? null,
             completed: e.completed ?? false,
         })));
         if (data.length > 0) {

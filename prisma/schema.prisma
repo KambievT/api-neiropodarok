@@ -19,6 +19,19 @@ model User {
   passwordHash String
 
   entries EntriesByDay[]
+  contractors Contractor[]
+}
+
+model Contractor {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  name   String
+
+  entries EntriesByDay[]
+
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 model EntriesByDay {
@@ -27,7 +40,10 @@ model EntriesByDay {
   userId      String
   dayKey      String
   clientName  String
+  contractor  Contractor? @relation(fields: [contractorId], references: [id], onDelete: SetNull)
+  contractorId String?
   description String? // Описание заявки (необязательно)
+  serviceType String? @default("individual") // individual | group
   amount      Int
   cost        Int?
   duration    Int?    // Длительность в секундах (необязательно)
