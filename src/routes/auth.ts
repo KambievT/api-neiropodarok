@@ -26,7 +26,7 @@ router.post("/register", async (req, res) => {
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ message: "Пароль должен быть от 6 символов" });
+        .json({ message: "Пароль должен быть от 6 символов !!!" });
     }
 
     const user = await createUser(email, password);
