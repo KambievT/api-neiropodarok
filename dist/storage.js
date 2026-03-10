@@ -59,7 +59,6 @@ async function getEntriesForUser(userId) {
     for (const row of rows) {
         const entry = {
             id: row.id,
-            clientName: row.clientName,
             contractorId: row.contractorId ?? undefined,
             description: row.description ?? undefined,
             serviceType: row.serviceType ?? "individual",
@@ -83,7 +82,7 @@ async function setEntriesForUser(userId, nextEntries) {
             id: e.id,
             userId,
             dayKey,
-            clientName: e.clientName,
+            clientName: "",
             contractorId: e.contractorId ?? null,
             description: e.description ?? null,
             serviceType: e.serviceType ?? "individual",

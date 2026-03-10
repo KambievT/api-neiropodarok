@@ -44,6 +44,43 @@ router.post("/", async (req, res) => {
         return res.status(500).json({ message: "Ошибка сервера" });
     }
 });
+router.patch("/:id", async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: "id обязателен" });
+    }
+    const { name } = req.body;
+    const trimmed = (name ?? "").trim();
+    if (!trimmed) {
+        return res.status(400).json({ message: "name обязателен" });
+    }
+    const existing = await prisma_1.prisma.contractor.findFirst({
+        where: { id, userId: req.user.id },
+        select: { id: true },
+    });
+    if (!existing) {
+        return res.status(404).json({ message: "Не найдено" });
+    }
+    try {
+        const updated = await prisma_1.prisma.contractor.update({
+            where: { id },
+            data: { name: trimmed },
+            select: { id: true, name: true },
+        });
+        return res.json(updated);
+    }
+    catch (e) {
+        // уникальность @@unique([userId, name])
+        if (e?.code === "P2002") {
+            return res.status(409).json({ message: "Подрядчик уже существует" });
+        }
+        console.error(e);
+        return res.status(500).json({ message: "Ошибка сервера" });
+    }
+});
 router.delete("/:id", async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ message: "Требуется авторизация" });

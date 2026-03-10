@@ -92,6 +92,7 @@ export async function setEntriesForUser(
         id: e.id,
         userId,
         dayKey,
+        clientName: "",
         contractorId: e.contractorId ?? null,
         description: e.description ?? null,
         serviceType: e.serviceType ?? "individual",
