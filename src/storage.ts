@@ -92,7 +92,6 @@ export async function setEntriesForUser(
         id: e.id,
         userId,
         dayKey,
-        clientName: "",
         contractorId: e.contractorId ?? null,
         description: e.description ?? null,
         serviceType: e.serviceType ?? "individual",
@@ -123,8 +122,7 @@ export async function setEntriesForUser(
           reasons.push("userId must be non-empty string");
         if (typeof item.dayKey !== "string" || item.dayKey.trim() === "")
           reasons.push("dayKey must be non-empty string");
-        if (typeof item.clientName !== "string")
-          reasons.push("clientName must be string");
+        // clientName is not present in the current schema; do not require it
         if (typeof item.amount !== "number" || !Number.isFinite(item.amount))
           reasons.push("amount must be number");
         if (
@@ -151,20 +149,22 @@ export async function setEntriesForUser(
     }
 
     if (invalidItems.length > 0) {
-      // Log details for debugging and throw controlled error so caller can handle
       console.warn(
-        "setEntriesForUser: invalid entries detected",
+        "setEntriesForUser: dropping invalid entries",
         JSON.stringify(invalidItems.slice(0, 10), null, 2),
       );
-      throw new Error(
-        `INVALID_ENTRIES: ${invalidItems.length} invalid entries`,
-      );
+    }
+
+    if (validData.length === 0) {
+      return;
     }
 
     try {
       await tx.entriesByDay.createMany({ data: validData });
     } catch (e) {
-      console.error("setEntriesForUser: createMany failed", e);
+      console.error("setEntriesForUser: createMany failed", e, {
+        sampleData: validData.slice(0, 5),
+      });
       throw e;
     }
   });

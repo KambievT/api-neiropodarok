@@ -130,7 +130,6 @@ exports.EntriesByDayScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
     dayKey: 'dayKey',
-    clientName: 'clientName',
     contractorId: 'contractorId',
     description: 'description',
     serviceType: 'serviceType',
