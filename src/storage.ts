@@ -103,8 +103,69 @@ export async function setEntriesForUser(
       })),
     );
 
-    if (data.length > 0) {
-      await tx.entriesByDay.createMany({ data });
+    if (data.length === 0) return;
+
+    // Validate data before calling Prisma to avoid runtime validation errors
+    const invalidItems: Array<{ index: number; item: any; reasons: string[] }> =
+      [];
+    const validData: typeof data = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      const reasons: string[] = [];
+
+      if (!item || typeof item !== "object") {
+        reasons.push("not an object");
+      } else {
+        if (typeof item.id !== "string" || item.id.trim() === "")
+          reasons.push("id must be non-empty string");
+        if (typeof item.userId !== "string" || item.userId.trim() === "")
+          reasons.push("userId must be non-empty string");
+        if (typeof item.dayKey !== "string" || item.dayKey.trim() === "")
+          reasons.push("dayKey must be non-empty string");
+        if (typeof item.clientName !== "string")
+          reasons.push("clientName must be string");
+        if (typeof item.amount !== "number" || !Number.isFinite(item.amount))
+          reasons.push("amount must be number");
+        if (
+          item.cost !== null &&
+          item.cost !== undefined &&
+          typeof item.cost !== "number"
+        )
+          reasons.push("cost must be number or null");
+        if (
+          item.duration !== null &&
+          item.duration !== undefined &&
+          typeof item.duration !== "number"
+        )
+          reasons.push("duration must be number or null");
+        if (typeof item.completed !== "boolean")
+          reasons.push("completed must be boolean");
+      }
+
+      if (reasons.length > 0) {
+        invalidItems.push({ index: i, item, reasons });
+      } else {
+        validData.push(item);
+      }
+    }
+
+    if (invalidItems.length > 0) {
+      // Log details for debugging and throw controlled error so caller can handle
+      console.warn(
+        "setEntriesForUser: invalid entries detected",
+        JSON.stringify(invalidItems.slice(0, 10), null, 2),
+      );
+      throw new Error(
+        `INVALID_ENTRIES: ${invalidItems.length} invalid entries`,
+      );
+    }
+
+    try {
+      await tx.entriesByDay.createMany({ data: validData });
+    } catch (e) {
+      console.error("setEntriesForUser: createMany failed", e);
+      throw e;
     }
   });
 }
