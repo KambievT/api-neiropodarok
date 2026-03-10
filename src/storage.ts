@@ -62,6 +62,7 @@ export async function getEntriesForUser(userId: string): Promise<EntriesByDay> {
   for (const row of rows) {
     const entry: DayEntry = {
       id: row.id,
+      clientName: row.clientName ?? undefined,
       contractorId: row.contractorId ?? undefined,
       description: row.description ?? undefined,
       serviceType: (row.serviceType as DayEntry["serviceType"]) ?? "individual",
@@ -92,6 +93,7 @@ export async function setEntriesForUser(
         id: e.id,
         userId,
         dayKey,
+        clientName: e.clientName ?? null,
         contractorId: e.contractorId ?? null,
         description: e.description ?? null,
         serviceType: e.serviceType ?? "individual",
@@ -122,7 +124,13 @@ export async function setEntriesForUser(
           reasons.push("userId must be non-empty string");
         if (typeof item.dayKey !== "string" || item.dayKey.trim() === "")
           reasons.push("dayKey must be non-empty string");
-        // clientName is not present in the current schema; do not require it
+        // clientName is optional string
+        if (
+          item.clientName !== null &&
+          item.clientName !== undefined &&
+          typeof item.clientName !== "string"
+        )
+          reasons.push("clientName must be string or null");
         if (typeof item.amount !== "number" || !Number.isFinite(item.amount))
           reasons.push("amount must be number");
         if (
@@ -159,11 +167,40 @@ export async function setEntriesForUser(
       return;
     }
 
+    // Sanitize items to include only fields that exist in the Prisma model
+    const sanitizedData = validData.map(
+      ({
+        id,
+        userId,
+        dayKey,
+        clientName,
+        contractorId,
+        description,
+        serviceType,
+        amount,
+        cost,
+        duration,
+        completed,
+      }) => ({
+        id,
+        userId,
+        dayKey,
+        clientName,
+        contractorId,
+        description,
+        serviceType,
+        amount,
+        cost,
+        duration,
+        completed,
+      }),
+    );
+
     try {
-      await tx.entriesByDay.createMany({ data: validData });
+      await tx.entriesByDay.createMany({ data: sanitizedData });
     } catch (e) {
       console.error("setEntriesForUser: createMany failed", e, {
-        sampleData: validData.slice(0, 5),
+        sampleData: sanitizedData.slice(0, 5),
       });
       throw e;
     }
