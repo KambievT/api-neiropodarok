@@ -197,7 +197,24 @@ export async function setEntriesForUser(
     );
 
     try {
-      await tx.entriesByDay.createMany({ data: sanitizedData });
+      // Remove duplicate items by `id` (keep the last occurrence)
+      const map = new Map<string, (typeof sanitizedData)[0]>();
+      for (const item of sanitizedData) {
+        map.set(item.id, item);
+      }
+      const uniqueData = Array.from(map.values());
+      if (uniqueData.length !== sanitizedData.length) {
+        console.warn(
+          "setEntriesForUser: found duplicate ids in payload, deduplicated",
+          { original: sanitizedData.length, deduped: uniqueData.length },
+        );
+      }
+
+      // Use skipDuplicates as an extra safety net
+      await tx.entriesByDay.createMany({
+        data: uniqueData,
+        skipDuplicates: true,
+      });
     } catch (e) {
       console.error("setEntriesForUser: createMany failed", e, {
         sampleData: sanitizedData.slice(0, 5),
