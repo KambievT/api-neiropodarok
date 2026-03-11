@@ -20,6 +20,7 @@ model User {
 
   entries EntriesByDay[]
   contractors Contractor[]
+  refreshTokens RefreshToken[]
 }
 
 model Contractor {
@@ -50,4 +51,16 @@ model EntriesByDay {
   completed   Boolean? @default(false)
 
   @@index([userId, dayKey])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

@@ -223,3 +223,43 @@ export async function setEntriesForUser(
     }
   });
 }
+
+export async function createRefreshToken(
+  userId: string,
+  token: string,
+  expiresAt: Date,
+): Promise<void> {
+  await prisma.refreshToken.create({
+    data: { token, userId, expiresAt, revoked: false },
+  });
+}
+
+export async function findRefreshToken(token: string) {
+  const row = await prisma.refreshToken.findUnique({ where: { token } });
+  return row
+    ? {
+        id: row.id,
+        token: row.token,
+        userId: row.userId,
+        expiresAt: row.expiresAt,
+        revoked: row.revoked,
+        createdAt: row.createdAt,
+      }
+    : null;
+}
+
+export async function revokeRefreshToken(token: string): Promise<void> {
+  await prisma.refreshToken.updateMany({
+    where: { token },
+    data: { revoked: true },
+  });
+}
+
+export async function revokeAllRefreshTokensForUser(
+  userId: string,
+): Promise<void> {
+  await prisma.refreshToken.updateMany({
+    where: { userId },
+    data: { revoked: true },
+  });
+}
