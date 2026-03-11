@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.EntriesByDayScalarFieldEnum = exports.ContractorScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.RefreshTokenScalarFieldEnum = exports.EntriesByDayScalarFieldEnum = exports.ContractorScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -77,7 +77,8 @@ exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
     User: 'User',
     Contractor: 'Contractor',
-    EntriesByDay: 'EntriesByDay'
+    EntriesByDay: 'EntriesByDay',
+    RefreshToken: 'RefreshToken'
 };
 /*
  * Enums
@@ -102,6 +103,7 @@ exports.EntriesByDayScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
     dayKey: 'dayKey',
+    clientName: 'clientName',
     contractorId: 'contractorId',
     description: 'description',
     serviceType: 'serviceType',
@@ -109,6 +111,14 @@ exports.EntriesByDayScalarFieldEnum = {
     cost: 'cost',
     duration: 'duration',
     completed: 'completed'
+};
+exports.RefreshTokenScalarFieldEnum = {
+    id: 'id',
+    token: 'token',
+    userId: 'userId',
+    expiresAt: 'expiresAt',
+    revoked: 'revoked',
+    createdAt: 'createdAt'
 };
 exports.SortOrder = {
     asc: 'asc',
